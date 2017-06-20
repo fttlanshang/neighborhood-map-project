@@ -4,21 +4,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     <title>Neighborhood Map Project</title>
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-3.3.7-dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
 <div class="container">
     <div class="col-md-3">
         <div class="input-group">
-            <input type="text" placeholder="Tsinghua University" class="form-control">
+            <input type="text" data-bind="textInput: searchText, event: {'keyup': autoComplete}" class="form-control">
             <span class="input-group-btn">
-                <button class="btn btn-default" type="button">filter</button>
+                <button class="btn btn-primary" type="button" data-bind="click: filterPlaces">
+                    <span class="glyphicon glyphicon-filter"></span> Filter
+                </button>
             </span>
         </div>
+        <div id="autoCompleteArea">
+            <ul data-bind="foreach: autoCompleteMarkers" class="list-group">
+                <li data-bind="text: $data.title, click: $parent.fill" class="list-item" ></li>
+            </ul>
+        </div>
         <div>
-            <ul data-bind="foreach: markers"  class="list-group">
-                <li data-bind="text: $data.title" class="list-group-item"></li><!-- forget the text property -->
+            <ul data-bind="foreach: filteredMarkers"  class="list-group">
+                <li data-bind="text: $data.title, click: $parent.highlightMarker" class="list-group-item"></li><!-- forget the text property -->
             </ul>
         </div>
     </div>

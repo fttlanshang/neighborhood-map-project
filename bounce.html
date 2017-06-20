@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>bounce-source</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, minimal-ui" />
+    <style type="text/css">
+        html {
+            font: 100%/1.5 "Roboto", Verdana, sans-serif;
+            color: #3d464d;
+            background-color: #fff;
+            -webkit-font-smoothing: antialiased;
+            width: 100%;
+            overflow: hidden-x;
+            text-align: center;
+        }
+        .font-style{
+            color: #f35626;
+            background-image: -webkit-linear-gradient(92deg,#f35626,#feab3a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -webkit-animation: hue 10s infinite linear;
+        }
+        h1{
+            margin-bottom: 1.5rem;
+            font-size: 6rem;
+            font-weight: 100;
+            line-height: 1;
+            letter-spacing: -.05em;
+        }
+        @-webkit-keyframes hue {
+          from {
+            -webkit-filter: hue-rotate(0deg);
+          }
+
+          to {
+            -webkit-filter: hue-rotate(-360deg);
+          }
+        }
+    </style>
+    <style type="text/css">
+        .animated {
+          animation-duration: 1s;
+          animation-fill-mode: both;
+        }
+
+        .animated.infinite {
+          animation-iteration-count: infinite;
+        }
+        .bounce {
+          animation-name: bounce;
+          transform-origin: center bottom;
+        }
+
+        @keyframes bounce {
+          from, 20%, 53%, 80%, to {
+            animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+            transform: translate3d(0,0,0);
+          }
+
+          40%, 43% {
+            animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+            transform: translate3d(0, -30px, 0);
+          }
+
+          70% {
+            animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+            transform: translate3d(0, -15px, 0);
+          }
+
+          90% {
+            transform: translate3d(0,-4px,0);
+          }
+        }
+    </style>
+</head>
+<body>
+    <header>
+      <div>
+       <span style="display: block;" class="bounce animated infinite"><h1 class="font-style">bounce</h1></span>
+      </div>
+    </header>
+</body>
+</html>

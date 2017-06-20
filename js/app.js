@@ -29,36 +29,107 @@ function initMap() {
     //     zoom: 14,
     //     center: center
     // });
-
-    ko.applyBindings(new ViewModel());
-}
-var Marker = function(data) { // is this good? or inside better?
-    return new window.google.maps.Marker({
-        position: data.locations,
-        title: data.title,
-        map: map
-    });
-}
-// var that = window;
-var ViewModel = function() {
-    var center = {lat: 39.999667, lng: 116.326444};
-    this.map = new window.google.maps.Map(document.getElementById('map'), {
-        zoom: 14,
+    var center = {lat: 39.981827, lng: 116.359302 };
+    map = new window.google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
         center: center
     });
+    ko.applyBindings(new ViewModel());
+}
+// var Marker = function(data) { // is this good? or inside better?
+//     return new window.google.maps.Marker({
+//         position: data.locations,
+//         title: data.title,
+//         map: map
+//     });
+// }
+// var that = window;
+var ViewModel = function() {
+// now markers and filteredMarkers are all observables, is this OK? thinks filteredMarkers is enough
+    var self = this;
+    this.searchText = ko.observable("Tsinghua University");
     this.markers = ko.observableArray([]);
+    this.filteredMarkers = ko.observableArray([]);
+    this.autoCompleteMarkers = ko.observableArray([]);
     // var bounds = new google.maps.LatLngBounds();
     var marker;
     for(var i = 0; i < locations.length; i++) {
         // console.log(window);
-        // marker = new window.google.maps.Marker({
-        //     position: locations[i].location,
-        //     title: locations[i].title,
-        //     map: map
-        // });
-        this.markers.push(new Marker(locations[i]));
-        // this.markers.push(marker);
+        marker = new window.google.maps.Marker({
+            position: locations[i].location,
+            title: locations[i].title,
+            map: map,
+            draggable: true,
+            animation: window.google.maps.Animation.DROP
+        });
+        console.log(marker);
+        // marker.addListener('click', toggleBounce);
+        marker.addListener('click', function(markerCopy) {
+            return function() {
+                if(markerCopy.getAnimation() != null) {
+                    markerCopy.setAnimation(null);
+                }else {
+                    markerCopy.setAnimation(window.google.maps.Animation.BOUNCE);
+                }
+            }
+        }(marker));
+        // this.markers.push(new Marker(locations[i]));
+        this.markers.push(marker);
+        this.filteredMarkers.push(marker);
         // bounds.extend(marker.position); // strange for putting here!!!
     }
     // map.fitBounds(bounds);
+    this.filterPlaces = function() {
+        hideMarkers(self.filteredMarkers()); //notice observables are functions
+        self.filteredMarkers.removeAll(); // is this right??
+        var str;
+        var pattern = self.searchText().toLowerCase();
+        // console.log(self.markers().length);
+        for(var i = 0; i < self.markers().length; i++) {
+            str = self.markers()[i].title.toLowerCase();
+            console.log(str);
+            if(str.indexOf(pattern) >= 0) self.filteredMarkers.push(self.markers()[i]);
+        }
+        showMarkers(self.filteredMarkers());
+    }
+    this.autoComplete = function() {
+        // console.log("autoComplete");
+        self.autoCompleteMarkers.removeAll();
+        var pattern = self.searchText().toLowerCase();
+        if(pattern === "")  return;
+        var str;
+        for(var i = 0; i < self.markers().length; i++) {
+            str = self.markers()[i].title.toLowerCase();
+            if(str.indexOf(pattern) >= 0)   self.autoCompleteMarkers.push(self.markers()[i]);
+        }
+    }
+    this.fill = function(marker) {
+        console.log(marker.title);
+        self.searchText(marker.title);
+        self.autoCompleteMarkers.removeAll();
+    }
+    this.highlightMarker = function(marker) {
+        toggleBounce(marker);
+        // should also show css changes!!!!!!!!!!!!!!!!!!
+        // event.target.addClass('bounce');
+    }
+    function showMarkers(markers) {
+        for(var i = 0; i < markers.length; i++) {
+            markers[i].setMap(map);
+        }
+    }
+    function hideMarkers(markers) {
+        for(var i = 0; i < markers.length; i++) {
+            // console.log(markers[i]);
+            markers[i].setMap(null);
+        }
+    }
+    function toggleBounce(marker) {
+        console.log(marker);
+        if(marker.getAnimation() != null) {
+            marker.setAnimation(null);
+        }else {
+            marker.setAnimation(window.google.maps.Animation.BOUNCE)
+        }
+    }
 }

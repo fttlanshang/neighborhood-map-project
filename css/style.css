@@ -1,5 +1,6 @@
 html, body, .container { //this line is quite important, otherwise it can't show up
-    // font-family: Arial, sans-serif;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
     height: 100%; // this line is a key for map showing up
     margin: 0;
     padding: 0;
@@ -12,5 +13,68 @@ html, body, .container { //this line is quite important, otherwise it can't show
 }
 .input-group {
     margin-top: 10%;
-    margin-bottom: 5%;
+    // margin-bottom: 5%;
 }
+#autoCompleteArea {
+    background-color: white;
+    // position: relative; // when using relative, the positions will change
+    position: absolute; // when using absolute, the width of this div will not fit
+    // top: 100%;
+    z-index: 5;
+    // .box-shadow(0 5px 10px rgba(0,0,0,.2));
+    color: blue; //color is not that pretty
+    float: left;
+    // width: 100%;
+}
+#autoCompleteArea .list-item {
+    clear: both;
+    position: relative;;
+    display: block;
+    padding: 5px 10px;
+    margin-bottom: -1px;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+
+    // background-color: grey;
+}
+#autoCompleteArea .list-item:first-child {
+    border-top: 1px solid #ddd;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+#autoCompleteArea .list-item:last-child {
+    margin-bottom: 0;
+    border-bottom: 1px solid #ddd;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+// .list-item:visit, .lise-group-item:visit {
+//     background-color: #222;
+// }
+// .animation {
+//     animation-durationas: 1s;
+//     animation-fill-mode: both;
+//     animation-iteration-count: 5;
+// }
+// .bounce {
+//     animation-name: bounce;
+//     transform-origin: center bottom;
+// }
+// @keyframes bounce {
+//     from, 20%, 53%, 80%, to {
+//         animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+//         transform: translate3d(0, 0, 0);
+//     }
+//     40%, 43% {
+//         animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+//         transform: translate3d(0, -30px, 0);
+//     }
+//     70% {
+//         animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+//         transform: translate3d(0, -15px, 0);
+//     }
+//     90% {
+//         transform: translate3d(0, -4px, 0);
+//     }
+// }
