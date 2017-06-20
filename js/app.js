@@ -3,20 +3,20 @@ var map;
 var locations = [ // hard coded here!!!!!!!!!!!
     {title: 'China Agricultural University Gymnasium',
         location: {lat:40.003973, lng: 116.35936}},
-    {title: 'Yuan Ming Yuan',
+    {title: 'Yuanmingyuan Park',
         location: {lat: 40.008098, lng: 116.298215}},
     {title: 'Tsinghua University',
         location: {lat: 39.999667, lng: 116.326444}},
-    {title: 'Ao Lin Pi Ke Sen Lin Gong Yuan',
+    {title: 'Olympic Forest Park',
         location: {lat: 40.032680, lng: 116.406112 }},
-    {title: 'Xiangshan Park',
-        location: {lat: 39.992618, lng: 116.186800 }},
-    {title: 'The Palace Museum',
+    {title: '798 Art Zone',
+        location: {lat: 39.982954, lng: 116.493244 }}, //?? change here
+    {title: 'Palace Museum',
         location: {lat: 39.916345, lng: 116.397155 }},
-    {title: 'Peking University Third Hospital',
-        location: {lat: 39.981827, lng: 116.359302 }},
-    {title: 'Jiangbian Chengwai',
-        location: {lat: 39.956689, lng: 116.462028 }},
+    {title: 'Peking University',
+        location: {lat: 39.986913, lng: 116.305874 }},
+    {title: 'Quanjude',
+        location: {lat: 39.912235, lng: 116.411924}},
     {title: 'Jian Wai SOHO',
         location: {lat: 39.905696, lng: 116.459838}},
     {title: 'Zhongguancun',
@@ -35,6 +35,7 @@ function initMap() {
         center: center
     });
     ko.applyBindings(new ViewModel());
+
 }
 // var Marker = function(data) { // is this good? or inside better?
 //     return new window.google.maps.Marker({
@@ -53,6 +54,7 @@ var ViewModel = function() {
     this.autoCompleteMarkers = ko.observableArray([]);
     // var bounds = new google.maps.LatLngBounds();
     var marker;
+    var infoWindow = new window.google.maps.InfoWindow();
     for(var i = 0; i < locations.length; i++) {
         // console.log(window);
         marker = new window.google.maps.Marker({
@@ -64,15 +66,18 @@ var ViewModel = function() {
         });
         console.log(marker);
         // marker.addListener('click', toggleBounce);
-        marker.addListener('click', function(markerCopy) {
+        marker.addListener('click', function(markerCopy, infoWindow) {
             return function() {
-                if(markerCopy.getAnimation() != null) {
-                    markerCopy.setAnimation(null);
-                }else {
-                    markerCopy.setAnimation(window.google.maps.Animation.BOUNCE);
-                }
+                // if(markerCopy.getAnimation() != null) {
+                //     markerCopy.setAnimation(null);
+                // }else {
+                //     markerCopy.setAnimation(window.google.maps.Animation.BOUNCE);
+                //     getDetail(markerCopy);
+                // }
+                toggleBounce(markerCopy);
+                getDetail(markerCopy, infoWindow);
             }
-        }(marker));
+        }(marker, infoWindow));
         // this.markers.push(new Marker(locations[i]));
         this.markers.push(marker);
         this.filteredMarkers.push(marker);
@@ -110,6 +115,7 @@ var ViewModel = function() {
     }
     this.highlightMarker = function(marker) {
         toggleBounce(marker);
+        getDetail(marker);
         // should also show css changes!!!!!!!!!!!!!!!!!!
         // event.target.addClass('bounce');
     }
@@ -132,4 +138,37 @@ var ViewModel = function() {
             marker.setAnimation(window.google.maps.Animation.BOUNCE)
         }
     }
+    function getDetail(marker) {
+        var flickrUrl = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ab797ec82187183fb4de60d218d80505';
+
+        console.log(marker.position.lat());
+        window.axios.get(flickrUrl, {
+            params: {
+                text: marker.title,
+                // tag: marker.title + "",// why tag isn't OK here??
+                // privacy_filter: 1,
+                accuracy: 11,
+                // content_type: 1,
+                per_page: 10,
+                format: 'json',
+                nojsoncallback: 1,
+                sort: 'relevance'
+            }
+        }).then(function (response) {
+            console.log(response);
+            var photo = response.data.photos.photo[0];
+            //format: https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}_[mstzb].jpg
+            var imgSrc = 'https://farm' + photo.farm + '.staticflickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_m.jpg';
+            // document.getElementById('marker-img').src = imgSrc;
+            infoWindow.setContent('<div><h4>' + marker.title + '</h4><img src="' + imgSrc + '"></div>');
+            infoWindow.open(map, marker);
+
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    }
+
 }
+// https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ab797ec82187183fb4de60d218d80505&text=Tsinghua+University&privacy_filter=1&accuracy=11&content_type=1&per_page=2&format=json&nojsoncallback=1
+// https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ab797ec82187183fb4de60d218d80505&text=Tsinghua+University&privacy_filter=1&accuracy=11&content_type=1&per_page=1&format=json&nojsoncallback=1&auth_token=72157683240545810-1ac592bf32b28e41&api_sig=43ca1a1c9225a20e586ba73bbd8789b2
