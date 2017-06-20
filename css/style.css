@@ -1,0 +1,16 @@
+html, body, .container { //this line is quite important, otherwise it can't show up
+    // font-family: Arial, sans-serif;
+    height: 100%; // this line is a key for map showing up
+    margin: 0;
+    padding: 0;
+}
+.container {
+    width: 100%;
+}
+#map {
+    height: 100%;
+}
+.input-group {
+    margin-top: 10%;
+    margin-bottom: 5%;
+}
