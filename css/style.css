@@ -13,7 +13,7 @@ html, body, .container { //this line is quite important, otherwise it can't show
 }
 #filter {
     margin-top: 5%;
-    // margin-bottom: 5%;
+    margin-bottom: 8%;
 }
 #search {
     font-size: 1.5rem;

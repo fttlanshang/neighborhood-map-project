@@ -2,59 +2,26 @@ var map;
 
 var locations = [ // hard coded here!!!!!!!!!!!
     {title: 'China Agricultural University Gymnasium',
-        location: {lat:40.003973, lng: 116.35936},
-        address: '17 Qinghua E Rd, Haidian Qu, Beijing Shi, China, 100083',
-        review: '体育馆好大，不过外墙有点掉色的感觉，保养没有工大好…',
-        rating: 9.4,
-        },
+        location: {lat:40.003973, lng: 116.35936}},
     {title: 'Yuanmingyuan Park',
-        location: {lat: 40.008098, lng: 116.298215},
-        address: 'Yuanmingyuan Park, Haidian, China',
-        review: 'Park featuring colorful gardens & ruins dating from 1707 & burned during Second Opium War of 1860.',
-        rating: 8.8,
-        },
+        location: {lat: 40.008098, lng: 116.298215}},
     {title: 'Tsinghua University',
-        location: {lat: 39.999667, lng: 116.326444},
-        address: '30 Shuangqing Rd, Haidian Qu, Beijing Shi, China',
-        review: 'The most famous university in China, like Oxford and Cambridge in UK.Quit and beautiful, good place to stay.',
-        rating: 9.2,},
+        location: {lat: 39.999667, lng: 116.326444}},
     {title: 'Olympic Forest Park',
-        location: {lat: 40.032680, lng: 116.406112 },
-        address: 'China, Beijing Shi, Chaoyang Qu, 林翠路2号',
-        review: 'It was a nice walk around greenish forest area.there is a walking track distance around 10 km.',
-        rating: 8.8,},
+        location: {lat: 40.032680, lng: 116.406112 }},
     {title: '798 Art Zone',
-        location: {lat: 39.982954, lng: 116.493244 },
-        address: '1 Qixing W St, Chaoyang Qu, Beijing Shi, China, 100096',
-        review: 'interesting but not expect lots of local arts, mainly a place with imported little gifts with some kinda designs',
-        rating: 8.6,},
+        location: {lat: 39.982954, lng: 116.493244 }},
     {title: 'Palace Museum',
-        location: {lat: 39.916345, lng: 116.397155 },
-        address: '4 Jingshan Front St, Dongcheng Qu, Beijing Shi, China, 100006',
-        review: 'This place is incredible. Cannot believe this was built to accommodate for one person hundreds of years ago!',
-        rating: 9.0,},
+        location: {lat: 39.916345, lng: 116.397155 }},
     {title: 'Peking University',
-        location: {lat: 39.986913, lng: 116.305874 },
-        address: '5 Yiheyuan Rd, Haidian Qu, Beijing Shi, China, 100080',
-        review: 'I have lived here for more than three years and will always miss it. Life was so convenient.',
-        rating: 9.0,},
+        location: {lat: 39.986913, lng: 116.305874 }},
     {title: 'Quanjude',
-        location: {lat: 39.912235, lng: 116.411924},
-    address: '9 Shuaifuyuan Hutong, DongDan, Dongcheng Qu, Beijing Shi, China, 100005',
-        review: 'The waitress is nice, they teach us how to wrap the duck correctly.  The duck is nice.  We ordered a little bit more than enough.  Half duck is only one small plate, whole duck  is 2 plates.  They offer us a free duck soup.  Very nice.  They keep the duck  warm the with a candle under the plate like my picture here. ',
-        rating: 8.2,},
+        location: {lat: 39.912235, lng: 116.411924}},
     {title: 'Jian Wai SOHO',
-        location: {lat: 39.905696, lng: 116.459838},
-    address: 'China, Beijing Shi, Chaoyang Qu, JianWai DaJie, JianWai SOHO',
-        review: 'A pretty modern place.',
-        rating: 8.0,},
+        location: {lat: 39.905696, lng: 116.459838}},
     {title: 'Zhongguancun',
-        location: {lat: 39.983245, lng: 116.315509 },
-    address: 'ZhongGuanCun, Haidian Qu, Beijing Shi, China, 100080',
-        review: 'It was full of vitality.',
-        rating: 8.2,}
+        location: {lat: 39.983245, lng: 116.315509 }}
 ];
-// var locations = [];
 
 function initMap() {
     var center = {lat: 39.981827, lng: 116.359302 };
@@ -62,12 +29,17 @@ function initMap() {
         zoom: 12,
         center: center
     });
-    var autoComplete = new window.google.maps.places.Autocomplete(document.getElementById('initialLocationQuery'));
-    // add one line, but what about the bounds, search within China
     ko.applyBindings(new ViewModel());
 
 }
-
+// var Marker = function(data) { // is this good? or inside better?
+//     return new window.google.maps.Marker({
+//         position: data.locations,
+//         title: data.title,
+//         map: map
+//     });
+// }
+// var that = window;
 var ViewModel = function() {
 // now markers and filteredMarkers are all observables, is this OK? thinks filteredMarkers is enough
     var self = this;
@@ -75,11 +47,12 @@ var ViewModel = function() {
     this.initialLocationQuery = ko.observable('Tsinghua University');
     this.markers = ko.observableArray([]);
     this.filteredMarkers = ko.observableArray([]);
-    // this.autoCompleteMarkers = ko.observableArray([]);
+    this.autoCompleteMarkers = ko.observableArray([]);
     this.infoWindow = new window.google.maps.InfoWindow();
     this.currentMarker = null;
     this.searchTopPicks = function() {
         var geocoder = new window.google.maps.Geocoder();
+        // console.log(self.initialLocationQuery());
         geocoder.geocode({'address': self.initialLocationQuery()}, function(results, status) {
             if(status === 'OK') {
                 var center = results[0].geometry.location;
@@ -118,25 +91,27 @@ var ViewModel = function() {
                 location.title = venue.name;
                 location.location.lat = venue.location.lat;
                 location.location.lng = venue.location.lng;
-                location.review = topPicks[i].tips[0].text;
-                location.rating = venue.rating;
-                // console.log(topPicks[i])
-                location.imgSrc = topPicks[i].tips[0].photourl;
-                location.address = venue.location.formattedAddress.join(",");
+                // var venuePhoto = venue.photos.groups[0].items[0]; // I can't add it as an attribute of a marker.
+                // if(venuePhoto != null) {
+                //     location.imgSrc = venuePhoto.prefix + venuePhoto.suffix;
+                // }
                 locations.push(location); //locations actually is an array full of pointers
             }
             console.log(locations);
+            // updateListView(self.filteredMarkers); // thinks a litter overhead for keeping filtered Markers and markers!!!!!!!!
+            // updateListView(self.markers);
             InitListView();
+            // var photo = response.data.photos.photo[0];
+            // var imgSrc = 'https://farm' + photo.farm + '.staticflickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_m.jpg';
+            // infoWindow.setContent('<div><h4>' + marker.title + '</h4><img src="' + imgSrc + '"></div>');
+            // infoWindow.open(map, marker);
+
         })
         .catch(function (error) {
             console.log(error);
             self.initialLocationQuery('Can not get top picks from FourSquare API due to: ' + error.message); // need to test
         });
     }
-    // function autoCompleteByGoogle() {
-        // var input
-
-    // }
     function InitListView() {
         var marker;
         var bounds = new google.maps.LatLngBounds();
@@ -152,7 +127,6 @@ var ViewModel = function() {
                 position: locations[i].location,
                 title: locations[i].title,
                 map: map,
-                // label: i + '',
                 draggable: true,
                 animation: window.google.maps.Animation.DROP
             });
@@ -167,15 +141,43 @@ var ViewModel = function() {
             // this.markers.push(new Marker(locations[i]));
             self.markers.push(marker);
             self.filteredMarkers.push(marker);
-            // console.log(self.markers());
-            // map.setZoom(14);
+            map.setZoom(14);
             map.fitBounds(bounds);
             // bounds.extend(marker.position); // strange for putting here!!!
         }
     }
+    // function updateListView() {// rebind the markers
+    //     var marker;
+    //     for(var i = 0; i < markers().length; i++) {
+    //         self.markers()[i].setMap(null);
+    //     }
+    //     self.markers.removeAll();
+    //     self.filteredMarkers.removeAll();
+    //     // console.log(markers());
+
+    //     for(var i = 0; i < locations.length; i++) {
+    //         marker = new window.google.maps.Marker({
+    //             position: locations[i].location,
+    //             title: locations[i].title,
+    //             map: map,
+    //             draggable: true,
+    //             animation: window.google.maps.Animation.DROP
+    //         });
+    //         // console.log('updateListView');
+    //         // marker.title = locations[i].title;
+    //         // var latlng = new google.maps.LatLng(locations[i].location.lat, locations[i].location.lng);
+    //         // marker.setPosition(latlng);
+    //         // marker.setMap(map);
+
+    //         self.markers.push(marker);
+    //         self.filteredMarkers.removeAll();
+    //     }
+    //     map.setZoom(14);
+    //     map.fitBounds(bounds);
+    // }
     // clear the old history and traverse again to filter
     this.filterPlaces = function() {
-        // self.autoCompleteMarkers.removeAll();
+        self.autoCompleteMarkers.removeAll();
         hideMarkers(self.filteredMarkers()); //notice observables are functions
         self.filteredMarkers.removeAll();
         var str;
@@ -187,22 +189,23 @@ var ViewModel = function() {
         }
         showMarkers(self.filteredMarkers());
     }
-    // this.autoComplete = function() {
-    //     self.autoCompleteMarkers.removeAll();
-    //     var pattern = self.searchText().toLowerCase();
-    //     // if(pattern === "")  return;
-    //     var str;
-    //     for(var i = 0; i < self.markers().length; i++) {
-    //         str = self.markers()[i].title.toLowerCase();
-    //         if(str.indexOf(pattern) >= 0)   self.autoCompleteMarkers.push(self.markers()[i]);
-    //     }
-    //     // self.filterPlaces();
-    // }
-    // this.fill = function(marker) {
-    //     console.log(marker.title);
-    //     self.searchText(marker.title);
-    //     self.autoCompleteMarkers.removeAll();
-    // }
+    this.autoComplete = function() {
+        // console.log("autoComplete");
+        self.autoCompleteMarkers.removeAll();
+        var pattern = self.searchText().toLowerCase();
+        // if(pattern === "")  return;
+        var str;
+        for(var i = 0; i < self.markers().length; i++) {
+            str = self.markers()[i].title.toLowerCase();
+            if(str.indexOf(pattern) >= 0)   self.autoCompleteMarkers.push(self.markers()[i]);
+        }
+        // self.filterPlaces();
+    }
+    this.fill = function(marker) {
+        console.log(marker.title);
+        self.searchText(marker.title);
+        self.autoCompleteMarkers.removeAll();
+    }
     this.highlightMarker = function(marker) {
         // var infoWindow = new window.google.maps.InfoWindow();
         if(self.currentMarker == marker)    toggleBounce(marker);
@@ -236,51 +239,37 @@ var ViewModel = function() {
             marker.setAnimation(window.google.maps.Animation.BOUNCE)
         }
     }
-    // function getDetail(marker, infoWindow) {
-    //     var flickrUrl = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=085913c6f0019d1908fba9e14b540b9c';
-    //     window.axios.get(flickrUrl, {
-    //         params: {
-    //             text: marker.title,
-    //             // tag: marker.title + "",// why tag isn't OK here??
-    //             // privacy_filter: 1,
-    //             accuracy: 11,
-    //             // content_type: 1,
-    //             per_page: 1,
-    //             format: 'json',
-    //             nojsoncallback: 1,
-    //             sort: 'relevance'
-    //         }
-    //     }).then(function (response) {
-    //         console.log(response);
-    //         var photoArray = response.data.photos.photo;
-    //         if(photoArray.length != 0) {
-    //             var photo = photoArray[0];
-    //             var imgSrc = 'https://farm' + photo.farm + '.staticflickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_m.jpg';
-    //             infoWindow.setContent('<div><h5>' + marker.title + '</h5><img src="' + imgSrc + '"></div>');
-    //         }else {
-    //             infoWindow.setContent('<div>' + marker.title + '</div>');
-    //         }
-    //         infoWindow.open(map, marker);
-
-    //     })
-    //     .catch(function (error) {
-    //         console.log(error);
-    //         infoWindow.setContent("<h5>Can't load a photo from Flickr due to: " + error.message + ".</h5>")
-    //     });
-    // }
     function getDetail(marker, infoWindow) {
-        console.log(self.markers.indexOf(marker));
-        var index = self.markers.indexOf(marker);
-        var item = locations[index];
-        console.log(item);
-        if(item.imgSrc == undefined) {
-            infoWindow.setContent('<h6>' + item.title + '</h6><p>' + item.address + '</p>' + '<p>Rating: ' + item.rating + '</p>' +
-            '<p>Review: ' + item.review + '</p>');
-        }else {
-            infoWindow.setContent('<h6>' + item.title + '</h6><p>' + item.address + '</p>' + '<p>Rating: ' + item.rating + '</p>' +
-            '<p>Review: ' + item.review + '</p>' + '<img class="infowindow" src="' + item.imgSrc + '">');
-        }
-        infoWindow.open(map, marker);
+        var flickrUrl = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=085913c6f0019d1908fba9e14b540b9c';
+        window.axios.get(flickrUrl, {
+            params: {
+                text: marker.title,
+                // tag: marker.title + "",// why tag isn't OK here??
+                // privacy_filter: 1,
+                accuracy: 11,
+                // content_type: 1,
+                per_page: 1,
+                format: 'json',
+                nojsoncallback: 1,
+                sort: 'relevance'
+            }
+        }).then(function (response) {
+            console.log(response);
+            var photoArray = response.data.photos.photo;
+            if(photoArray.length != 0) {
+                var photo = photoArray[0];
+                var imgSrc = 'https://farm' + photo.farm + '.staticflickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_m.jpg';
+                infoWindow.setContent('<div><h5>' + marker.title + '</h5><img src="' + imgSrc + '"></div>');
+            }else {
+                infoWindow.setContent('<div>' + marker.title + '</div>');
+            }
+            infoWindow.open(map, marker);
+
+        })
+        .catch(function (error) {
+            console.log(error);
+            infoWindow.setContent("<h5>Can't load a photo from Flickr due to: " + error.message + ".</h5>")
+        });
     }
     InitListView();
 }
