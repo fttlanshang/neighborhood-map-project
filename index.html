@@ -9,8 +9,18 @@
 </head>
 <body>
 <div class="container">
+    <div id="search">
+        <div class="row input-group" >
+            <input type="text" class="form-control" data-bind="textInput: initialLocationQuery" placeholder="Where do you want to go?">
+            <span class="input-group-btn"><!-- thinks that only show a little icon, i.e. if user don't specify the location, then will use default -->
+                <button class="btn btn-default" type="button" data-bind="click: searchTopPicks">
+                    <span class="glyphicon glyphicon-search"></span> Search
+                </button>
+            </span>
+        </div>
+    </div>
     <div class="col-md-3">
-        <div class="input-group">
+        <div class="input-group" id="filter">
             <input type="text" data-bind="textInput: searchText, event: {'keyup': autoComplete}" class="form-control">
             <span class="input-group-btn">
                 <button class="btn btn-primary" type="button" data-bind="click: filterPlaces">
