@@ -227,11 +227,14 @@ var ViewModel = function() {
         getDetail(marker, self.infoWindow);
     }
 
-    // show all the markers using setMap method.
+    // show all the markers using setMap method. At the same time, I reset the bounds during the filter process.
     var showMarkers = function(markers) {
+        var bounds = new google.maps.LatLngBounds();
         for(var i = 0; i < markers.length; i++) {
             markers[i].setMap(map);
+            bounds.extend(markers[i].position);
         }
+        map.fitBounds(bounds);
     }
     // hide all the markers using setMap method.
     var hideMarkers = function(markers) {

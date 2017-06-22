@@ -10,4 +10,4 @@ This is a simple map utilizing Knockout framework and google map API and other l
 
 ### How to run the app
 1. Clone the project or download the zip file, open the index.html.
-2. Or just open this [demo]();
+2. Or just open this [demo](https://fttlanshang.github.io/neighborhood-map-project/);
