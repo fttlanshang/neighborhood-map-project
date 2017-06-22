@@ -1,4 +1,4 @@
-### Neighborhood map project
+# Neighborhood map project
 This is a simple map utilizing Knockout framework and google map API and other libraries, like Bootstrap and axios.
 
 ### General idea and functionalities
