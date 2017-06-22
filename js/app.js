@@ -97,7 +97,7 @@ var ViewModel = function() {
             return self.markers();
         }else {
             return ko.utils.arrayFilter(self.markers(), function(marker, index) {
-                console.log(marker.title.toLowerCase());
+                // console.log(marker.title.toLowerCase());
                 return marker.title.toLowerCase().indexOf(pattern) >= 0;
             })
         }
@@ -112,6 +112,9 @@ var ViewModel = function() {
     // Toggle the list panel when the hamburger menu is clicked.
     this.toggleShow = function() {
         self.currentState(-self.currentState());
+    }
+    this.locationQuery = function(el, event) {
+        if(event.keyCode == 13) self.searchTopPicks();
     }
 
     //When the search button is clicked, searchTopPicks will be called.
@@ -167,8 +170,10 @@ var ViewModel = function() {
                 location.location.lat = venue.location.lat;
                 location.location.lng = venue.location.lng;
                 if(topPicks[i].tips != null) { // some places didn't have tips property
-                    location.review = topPicks[i].tips[0].text;
-                    location.imgSrc = topPicks[i].tips[0].photourl;
+                    var tip = topPicks[i].tips[0];
+                    location.review = tip.text;
+                    location.imgSrc = tip.photourl;
+                    location.referenceUrl = tip.canonicalUrl;
                 }
                 location.rating = venue.rating;
                 location.address = venue.location.formattedAddress.join(",");
@@ -253,23 +258,18 @@ var ViewModel = function() {
     }
 
     // When the list item or marker is clicked, it will show animation as well as the detailed information.
-    // This function will get details from locations array.But the setContent method is quite repeated!! How to solve this?
+    // This function will get details from locations array.
     function getDetail(marker, infoWindow) {
         map.panTo(marker.position);
         var index = self.markers.indexOf(marker);
         var item = locations[index];
-        if(item.imgSrc == undefined) {
-            infoWindow.setContent('<div class="infowindow"><h4>' + item.title + '</h4>'
-                + '<p><span class="glyphicon glyphicon-map-marker"></span> ' + item.address+ '</p>'
-                + '<p><span class="glyphicon glyphicon-heart"></span>   ' + item.rating + '</p>'
-                + '<p><span class="glyphicon glyphicon-pencil"></span>  ' + item.review + '</p></div>'); //may not exist the review
-        }else {
-            infoWindow.setContent('<div class="infowindow"><h4>' + item.title + '</h4>'
-                + '<p><span class="glyphicon glyphicon-map-marker"></span> ' + item.address+ '</p>'
-                + '<p><span class="glyphicon glyphicon-heart"></span>   ' + item.rating + '</p>'
-                + '<p><span class="glyphicon glyphicon-pencil"></span>  ' + item.review + '</p>'
-                + '<img class="infowindow" src="' + item.imgSrc + '"></div>');
-        }
+        var ratingHTML = (item.rating == undefined) ? "" : ('<p><span class="glyphicon glyphicon-heart"></span>   ' + item.rating + '</p>');
+        var reviewHTML = (item.review == undefined) ? "" : ('<p><span class="glyphicon glyphicon-pencil"></span>  ' + item.review + '</p>');
+        var linkHTML = (item.referenceUrl == undefined) ? "" : ('<a href="' + item.referenceUrl + '" target="blank">' + 'More about this place</a>');
+        var imgHTML = (item.imgSrc == undefined) ? "" : ('<img class="infowindow" src="' + item.imgSrc + '">');
+        infoWindow.setContent('<div class="infowindow"><h4>' + item.title + '</h4>'
+            + '<p><span class="glyphicon glyphicon-map-marker"></span> ' + item.address+ '</p>'
+            + ratingHTML + reviewHTML + imgHTML + linkHTML + '</div>');
         infoWindow.open(map, marker);
     }
     InitListView();

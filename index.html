@@ -12,14 +12,14 @@
     <div id="search" class="row">
         <div class="col-md-1  col-sm-1 col-xs-1">
             <div class="toggle-menu col-md-1 col-sm-1">
-                <button type="button"  data-bind="click: toggleShow"><!-- class="f-toggle" -->
+                <button type="button"  data-bind="click: toggleShow">
                    <span class="glyphicon glyphicon-menu-hamburger"></span>
                 </button>
             </div>
         </div>
         <div class="col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-1 col-xs-9">
             <div class="input-group">
-                <input type="text" class="form-control" data-bind="value: initialLocationQuery, valueUpdate: 'afterkeydown'" placeholder="Where do you want to go?" id="initialLocationQuery">
+                <input type="text" class="form-control" data-bind="textInput: initialLocationQuery, event:{keyup: locationQuery}" placeholder="Where do you want to go?" id="initialLocationQuery">
                 <span class="input-group-btn">
                     <button class="btn btn-default" type="button" data-bind="click: searchTopPicks">
                         <span class="glyphicon glyphicon-search"></span> Search
