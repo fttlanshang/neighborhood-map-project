@@ -1,8 +1,6 @@
-var map; // map is a global variable.
+var map;
 
-//the initial locations are hard coded and the detailed infomation is manually getting from google map.
-//For simplicity, no photoUrl is included.
-var locations = [
+var locations = [ // hard coded here!!!!!!!!!!!
     {title: 'China Agricultural University Gymnasium',
         location: {lat:40.003973, lng: 116.35936},
         address: '17 Qinghua E Rd, Haidian Qu, Beijing Shi, China, 100083',
@@ -56,93 +54,92 @@ var locations = [
         review: 'It was full of vitality.',
         rating: 8.2,}
 ];
-// I use setTimeout to handle the google map load error, but sometimes the response time is much longer than 5 seconds, why?
-var mapConstructTimeout = setTimeout(function() {
-    document.getElementById('map').innerHTML = "<h2 class='map-error'>Sorry, an error happened. Can't load the map.</h2>";
-}, 8000);
+// var locations = [];
 
-//the callback function, initialize the map and the autocomplete, apply ko bindings
-var initMap = function() {
+function initMap() {
     var center = {lat: 39.981827, lng: 116.359302 };
     map = new window.google.maps.Map(document.getElementById('map'), {
         zoom: 12,
         center: center
     });
-    if(map != null) {
-        clearTimeout(mapConstructTimeout);
-    }
     var autoComplete = new window.google.maps.places.Autocomplete(document.getElementById('initialLocationQuery'), {
         componentRestrictions: {country: 'cn'}
     });
+    // autoComplete.addListener('place_changed', fillInAddress);
+    // function fillInAddress() {
+    //     console.log(autoComplete.getPlace());
+    //     self.initialLocationQuery(autoComplete.getPlace());
+    // }
+    // add one line, but what about the bounds, search within China
     ko.applyBindings(new ViewModel());
+
 }
 
-// View Model, keeping track of all the events, input variables and others.
 var ViewModel = function() {
+// now markers and filteredMarkers are all observables, is this OK? thinks filteredMarkers is enough
     var self = this;
-    this.currentState = ko.observable(1); // observes the state of the list panel
-    this.searchText = ko.observable(""); // the input of the filter
-    this.initialLocationQuery = ko.observable(''); // the input of the top search
+    this.currentState = ko.observable(1);
+    this.searchText = ko.observable("");// need to change at last
+    this.initialLocationQuery = ko.observable('Tsinghua University');
     this.markers = ko.observableArray([]);
-
-     // Since only ont infowindow is opened at one time, so I declare the infowindow as a property of viewmodel.
-    this.infoWindow = new window.google.maps.InfoWindow();
-    this.currentMarker = null; // keeping track of the current marker to handle bounce event so only one marker is animated at a time.
-
-    // filteredMarkers is computed from this.markers and the list is binding to it.
-    //When this.markers change, this.filteredMarkers will automatically change and so does the list.
     this.filteredMarkers = ko.computed(function() {
         var pattern = self.searchText().toLowerCase();
+        console.log(pattern);
         if(pattern == '') {
+            console.log("this way");
             return self.markers();
         }else {
+            console.log(self.markers());
             return ko.utils.arrayFilter(self.markers(), function(marker, index) {
                 console.log(marker.title.toLowerCase());
                 return marker.title.toLowerCase().indexOf(pattern) >= 0;
             })
         }
-    });//.extend({ notify: 'always' })
+    }).extend({ notify: 'always' });
 
-    // When filter button is clicked or keyup is happened, reset the markers
+    // clear the old history and traverse again to filter
     this.filterPlaces = function() {
+        // self.autoCompleteMarkers.removeAll();
         hideMarkers(self.markers()); //notice observables are functions
+        // self.filteredMarkers.removeAll();
+        // var str;
+        // var pattern = self.searchText().toLowerCase();
+        // for(var i = 0; i < self.markers().length; i++) {
+        //     str = self.markers()[i].title.toLowerCase();
+        //     // console.log(str);
+        //     if(str.indexOf(pattern) >= 0) self.filteredMarkers.push(self.markers()[i]);
+        // }
         showMarkers(self.filteredMarkers());
     }
-
-    // Toggle the list panel when the hamburger menu is clicked.
+    // this.filteredMarkers = ko.observableArray([]);
+    // this.autoCompleteMarkers = ko.observableArray([]);
+    this.infoWindow = new window.google.maps.InfoWindow(); // not that good, right??
+    this.currentMarker = null;
     this.toggleShow = function() {
         self.currentState(-self.currentState());
     }
-
-    //When the search button is clicked, searchTopPicks will be called.
-    //It will geocode the input to lat and lng and then call getTopPicksFromSquare function to retrieve data from FourSquare API.
-    //But when user doesn't select a place from autoComplete, things get a little uncontrolled.
+    // this.mapSizeRatio = ko.computed(function() {
+    //     return self.currentState() < 0 ? "col-md-12" : "col-md-9";
+    // })
     this.searchTopPicks = function() {
         var geocoder = new window.google.maps.Geocoder();
-        geocoder.geocode({'address': self.initialLocationQuery(),
-                        componentRestrictions: {country: 'cn'}},
-        function(results, status) {
+        geocoder.geocode({'address': self.initialLocationQuery()}, function(results, status) {
             if(status === 'OK') {
-                console.log(results);
                 var center = results[0].geometry.location;
+                map.setCenter(center);
+                // map.setZoom(15);
                 getTopPicksFromSquare(center);
             }else {
                 self.initialLocationQuery('Geocode was not successful for the reason: ' + status);
+                // alert('Geocode was not successful for the reason: ' + status);
             }
         });
     }
-    var padding = function(num) {
-        if(num > 0 && num <= 9) {
-            return '0' + num;
-        }else   return num.toString();
-    }
 
-    // Get top picks from FourSquare API using axios library. After getting the new data, locations array will be cleared and reused.
-    //Then, InitListView function is called.
-    var getTopPicksFromSquare = function(center) {
+
+    function getTopPicksFromSquare(center) {
+        // console.log(center.lat());
         var fourSquareUrl = 'https://api.foursquare.com/v2/venues/explore?';
-        var date = new Date();
-        var dateStr = date.getFullYear() + '' + padding(date.getMonth()) + padding(date.getDay());
         window.axios.get(fourSquareUrl, {
             params: {
                 ll: center.lat().toFixed(3) + ',' + center.lng().toFixed(3),
@@ -151,14 +148,14 @@ var ViewModel = function() {
                 limit: 10,
                 client_id: 'N5WZOLWC4GO3MSQFIMODIP5ULRAVCKRGGYCKSAIH3FH41HIC',
                 client_secret: 'GKNWBWCDZMCBHEQPDFWW3YRNHAYFZZ1AKU4EM1DKXPNFOLM0',
-                v: dateStr // need to parse date, but later!!!!!!!!!!!!!!!!!!!!!!!!!
+                v: 20170621 // need to parse date, but later!!!!!!!!!!!!!!!!!!!!!!!!!
             }
         })
         .then(function (results) {
             // console.log(results);
             var topPicks = results.data.response.groups[0].items;// an array
-            // console.log(topPicks);
-            locations = [];// make locations array empty to store new data
+            console.log(topPicks);
+            locations = [];// make it empty here!!
             for(var i = 0; i < topPicks.length; i++) {
                 var location = {};// if put this line out of the loop, then items in locations will be the same
                 location.location = {};
@@ -166,14 +163,16 @@ var ViewModel = function() {
                 location.title = venue.name;
                 location.location.lat = venue.location.lat;
                 location.location.lng = venue.location.lng;
-                if(topPicks[i].tips != null) { // some places didn't have tips property
+                if(topPicks[i].tips != null) {
                     location.review = topPicks[i].tips[0].text;
                     location.imgSrc = topPicks[i].tips[0].photourl;
                 }
                 location.rating = venue.rating;
+                // console.log(topPicks[i])
                 location.address = venue.location.formattedAddress.join(",");
                 locations.push(location); //locations actually is an array full of pointers
             }
+            console.log(locations);
             InitListView();
         })
         .catch(function (error) {
@@ -181,41 +180,65 @@ var ViewModel = function() {
             self.initialLocationQuery('Can not get top picks from FourSquare API due to: ' + error.message); // need to test
         });
     }
+    // function autoCompleteByGoogle() {
+        // var input
 
-    // This function is responsive for getting data from locations to markers and thus update the view.
-    var InitListView = function() {
+    // }
+    function InitListView() {
         var marker;
         var bounds = new google.maps.LatLngBounds();
-        if(self.markers().length > 0) { // if it's length > 0, meaning it has previous data, so markers need to be removed.
+        if(self.markers().length > 0) {
             for(var i = 0; i < self.markers().length; i++) {
                 self.markers()[i].setMap(null);
             }
             self.markers.removeAll();
+            // self.filteredMarkers.removeAll();
         }
         for(var i = 0; i < locations.length; i++) {
             marker = new window.google.maps.Marker({
                 position: locations[i].location,
                 title: locations[i].title,
                 map: map,
+                // label: i + '',
                 draggable: true,
                 animation: window.google.maps.Animation.DROP
             });
+            // console.log(marker);
+            // marker.addListener('click', toggleBounce);
             marker.addListener('click', function(markerCopy) {
                 return function() {
                     self.highlightMarker(markerCopy);
                 }
             }(marker));
             bounds.extend(marker.position);
+            // this.markers.push(new Marker(locations[i]));
             self.markers.push(marker);
+            // self.filteredMarkers.push(marker);
+            // console.log(self.markers());
+            // map.setZoom(14);
             map.fitBounds(bounds);
+            // bounds.extend(marker.position); // strange for putting here!!!
         }
     }
 
-    // When a list item is clicked or a marker is clicked, this function will be called.
-    // And there are 2 conditions:
-    //      (1)click the previous one, toggle;
-    //      (2)click a new one, need to set previous one's animation to null and update the currentMarker
+    // this.autoComplete = function() {
+    //     self.autoCompleteMarkers.removeAll();
+    //     var pattern = self.searchText().toLowerCase();
+    //     // if(pattern === "")  return;
+    //     var str;
+    //     for(var i = 0; i < self.markers().length; i++) {
+    //         str = self.markers()[i].title.toLowerCase();
+    //         if(str.indexOf(pattern) >= 0)   self.autoCompleteMarkers.push(self.markers()[i]);
+    //     }
+    //     // self.filterPlaces();
+    // }
+    // this.fill = function(marker) {
+    //     console.log(marker.title);
+    //     self.searchText(marker.title);
+    //     self.autoCompleteMarkers.removeAll();
+    // }
     this.highlightMarker = function(marker) {
+        // var infoWindow = new window.google.maps.InfoWindow();
         if(self.currentMarker == marker)    toggleBounce(marker);
         else {
             if(self.currentMarker != null)  {
@@ -225,36 +248,67 @@ var ViewModel = function() {
             toggleBounce(marker);
         }
         getDetail(marker, self.infoWindow);
+        // should also show css changes!!!!!!!!!!!!!!!!!!
     }
-
-    // show all the markers using setMap method.
-    var showMarkers = function(markers) {
+    function showMarkers(markers) {
         for(var i = 0; i < markers.length; i++) {
             markers[i].setMap(map);
         }
     }
-    // hide all the markers using setMap method.
-    var hideMarkers = function(markers) {
+    function hideMarkers(markers) {
         for(var i = 0; i < markers.length; i++) {
+            // console.log(markers[i]);
             markers[i].setMap(null);
         }
     }
-
-    // toggle the marker's animation
-    var toggleBounce = function(marker) {
+    function toggleBounce(marker) {
+        console.log(marker);
+        // if(marker == null)  return;
         if(marker.getAnimation() != null) {
             marker.setAnimation(null);
         }else {
             marker.setAnimation(window.google.maps.Animation.BOUNCE)
         }
     }
+    // function getDetail(marker, infoWindow) {
+    //     var flickrUrl = 'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=085913c6f0019d1908fba9e14b540b9c';
+    //     window.axios.get(flickrUrl, {
+    //         params: {
+    //             text: marker.title,
+    //             // tag: marker.title + "",// why tag isn't OK here??
+    //             // privacy_filter: 1,
+    //             accuracy: 11,
+    //             // content_type: 1,
+    //             per_page: 1,
+    //             format: 'json',
+    //             nojsoncallback: 1,
+    //             sort: 'relevance'
+    //         }
+    //     }).then(function (response) {
+    //         console.log(response);
+    //         var photoArray = response.data.photos.photo;
+    //         if(photoArray.length != 0) {
+    //             var photo = photoArray[0];
+    //             var imgSrc = 'https://farm' + photo.farm + '.staticflickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret + '_m.jpg';
+    //             infoWindow.setContent('<div><h5>' + marker.title + '</h5><img src="' + imgSrc + '"></div>');
+    //         }else {
+    //             infoWindow.setContent('<div>' + marker.title + '</div>');
+    //         }
+    //         infoWindow.open(map, marker);
 
-    // When the list item or marker is clicked, it will show animation as well as the detailed information.
-    // This function will get details from locations array.But the setContent method is quite repeated!! How to solve this?
+    //     })
+    //     .catch(function (error) {
+    //         console.log(error);
+    //         infoWindow.setContent("<h5>Can't load a photo from Flickr due to: " + error.message + ".</h5>")
+    //     });
+    // }
     function getDetail(marker, infoWindow) {
+        // var latLng = new window.google.maps.LatLng(marker.position.lat(), marker.position.lng());
+        // map.panTo(latLng);
         map.panTo(marker.position);
         var index = self.markers.indexOf(marker);
         var item = locations[index];
+        // console.log(item);
         if(item.imgSrc == undefined) {
             infoWindow.setContent('<div class="infowindow"><h4>' + item.title + '</h4>'
                 + '<p><span class="glyphicon glyphicon-map-marker"></span> ' + item.address+ '</p>'
@@ -268,6 +322,9 @@ var ViewModel = function() {
                 + '<img class="infowindow" src="' + item.imgSrc + '"></div>');
         }
         infoWindow.open(map, marker);
+        //  glyphicon glyphicon-star,glyphicon glyphicon-heart-empty,glyphicon glyphicon-hand-right,glyphicon glyphicon-map-marker, glyphicon glyphicon-pencil
     }
     InitListView();
 }
+// https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ab797ec82187183fb4de60d218d80505&text=Tsinghua+University&privacy_filter=1&accuracy=11&content_type=1&per_page=2&format=json&nojsoncallback=1
+// https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=ab797ec82187183fb4de60d218d80505&text=Tsinghua+University&privacy_filter=1&accuracy=11&content_type=1&per_page=1&format=json&nojsoncallback=1&auth_token=72157683240545810-1ac592bf32b28e41&api_sig=43ca1a1c9225a20e586ba73bbd8789b2
