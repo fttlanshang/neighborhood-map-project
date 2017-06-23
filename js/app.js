@@ -179,6 +179,7 @@ var ViewModel = function() {
                 location.address = venue.location.formattedAddress.join(",");
                 locations.push(location); //locations actually is an array full of pointers
             }
+            console.log(locations);
             InitListView();
         })
         .catch(function (error) {
@@ -197,10 +198,10 @@ var ViewModel = function() {
             }
             self.markers.removeAll();
         }
-        for(i = 0; i < locations.length; i++) {
+        for(var j = 0; j < locations.length; j++) {
             marker = new window.google.maps.Marker({
-                position: locations[i].location,
-                title: locations[i].title,
+                position: locations[j].location,
+                title: locations[j].title,
                 map: map,
                 draggable: true,
                 animation: window.google.maps.Animation.DROP
@@ -272,4 +273,4 @@ var ViewModel = function() {
         infoWindow.open(map, marker);
     };
     InitListView();
-}
+};
