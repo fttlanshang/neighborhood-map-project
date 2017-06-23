@@ -68,14 +68,14 @@ var initMap = function() {
         zoom: 12,
         center: center
     });
-    if(map != null) {
+    if(map !== null) {
         clearTimeout(mapConstructTimeout);
     }
     var autoComplete = new window.google.maps.places.Autocomplete(document.getElementById('initialLocationQuery'), {
         componentRestrictions: {country: 'cn'}
     });
     ko.applyBindings(new ViewModel());
-}
+};
 
 // View Model, keeping track of all the events, input variables and others.
 var ViewModel = function() {
@@ -93,13 +93,13 @@ var ViewModel = function() {
     //When this.markers change, this.filteredMarkers will automatically change and so does the list.
     this.filteredMarkers = ko.computed(function() {
         var pattern = self.searchText().toLowerCase();
-        if(pattern == '') {
+        if(pattern === '') {
             return self.markers();
         }else {
             return ko.utils.arrayFilter(self.markers(), function(marker, index) {
                 // console.log(marker.title.toLowerCase());
                 return marker.title.toLowerCase().indexOf(pattern) >= 0;
-            })
+            });
         }
     });//.extend({ notify: 'always' })
 
@@ -107,15 +107,15 @@ var ViewModel = function() {
     this.filterPlaces = function() {
         hideMarkers(self.markers()); //notice observables are functions
         showMarkers(self.filteredMarkers());
-    }
+    };
 
     // Toggle the list panel when the hamburger menu is clicked.
     this.toggleShow = function() {
         self.currentState(-self.currentState());
-    }
+    };
     this.locationQuery = function(el, event) {
         if(event.keyCode == 13) self.searchTopPicks();
-    }
+    };
 
     //When the search button is clicked, searchTopPicks will be called.
     //It will geocode the input to lat and lng and then call getTopPicksFromSquare function to retrieve data from FourSquare API.
@@ -133,12 +133,12 @@ var ViewModel = function() {
                 self.initialLocationQuery('Geocode was not successful for the reason: ' + status);
             }
         });
-    }
+    };
     var padding = function(num) {
         if(num > 0 && num <= 9) {
             return '0' + num;
         }else   return num.toString();
-    }
+    };
 
     // Get top picks from FourSquare API using axios library. After getting the new data, locations array will be cleared and reused.
     //Then, InitListView function is called.
@@ -169,7 +169,7 @@ var ViewModel = function() {
                 location.title = venue.name;
                 location.location.lat = venue.location.lat;
                 location.location.lng = venue.location.lng;
-                if(topPicks[i].tips != null) { // some places didn't have tips property
+                if(topPicks[i].tips !== null) { // some places didn't have tips property
                     var tip = topPicks[i].tips[0];
                     location.review = tip.text;
                     location.imgSrc = tip.photourl;
@@ -185,7 +185,7 @@ var ViewModel = function() {
             console.log(error);
             self.initialLocationQuery('Can not get top picks from FourSquare API due to: ' + error.message); // need to test
         });
-    }
+    };
 
     // This function is responsive for getting data from locations to markers and thus update the view.
     var InitListView = function() {
@@ -197,7 +197,7 @@ var ViewModel = function() {
             }
             self.markers.removeAll();
         }
-        for(var i = 0; i < locations.length; i++) {
+        for(i = 0; i < locations.length; i++) {
             marker = new window.google.maps.Marker({
                 position: locations[i].location,
                 title: locations[i].title,
@@ -205,16 +205,17 @@ var ViewModel = function() {
                 draggable: true,
                 animation: window.google.maps.Animation.DROP
             });
-            marker.addListener('click', function(markerCopy) {
-                return function() {
-                    self.highlightMarker(markerCopy);
-                }
-            }(marker));
+            marker.addListener('click', handleMarkerClick);
             bounds.extend(marker.position);
             self.markers.push(marker);
             map.fitBounds(bounds);
         }
-    }
+    };
+    // the event handler for marker clicking events
+    var handleMarkerClick = function() {
+        var markerCopy = this;
+        self.highlightMarker(markerCopy);
+    };
 
     // When a list item is clicked or a marker is clicked, this function will be called.
     // And there are 2 conditions:
@@ -223,14 +224,14 @@ var ViewModel = function() {
     this.highlightMarker = function(marker) {
         if(self.currentMarker == marker)    toggleBounce(marker);
         else {
-            if(self.currentMarker != null)  {
+            if(self.currentMarker !== null)  {
                  self.currentMarker.setAnimation(null);
             }
             self.currentMarker = marker;
             toggleBounce(marker);
         }
         getDetail(marker, self.infoWindow);
-    }
+    };
 
     // show all the markers using setMap method. At the same time, I reset the bounds during the filter process.
     var showMarkers = function(markers) {
@@ -240,37 +241,35 @@ var ViewModel = function() {
             bounds.extend(markers[i].position);
         }
         map.fitBounds(bounds);
-    }
+    };
     // hide all the markers using setMap method.
     var hideMarkers = function(markers) {
         for(var i = 0; i < markers.length; i++) {
             markers[i].setMap(null);
         }
-    }
+    };
 
     // toggle the marker's animation
     var toggleBounce = function(marker) {
-        if(marker.getAnimation() != null) {
+        if(marker.getAnimation() !== null) {
             marker.setAnimation(null);
         }else {
-            marker.setAnimation(window.google.maps.Animation.BOUNCE)
+            marker.setAnimation(window.google.maps.Animation.BOUNCE);
         }
-    }
+    };
 
     // When the list item or marker is clicked, it will show animation as well as the detailed information.
     // This function will get details from locations array.
-    function getDetail(marker, infoWindow) {
+    var getDetail = function(marker, infoWindow) {
         map.panTo(marker.position);
         var index = self.markers.indexOf(marker);
         var item = locations[index];
-        var ratingHTML = (item.rating == undefined) ? "" : ('<p><span class="glyphicon glyphicon-heart"></span>   ' + item.rating + '</p>');
-        var reviewHTML = (item.review == undefined) ? "" : ('<p><span class="glyphicon glyphicon-pencil"></span>  ' + item.review + '</p>');
-        var linkHTML = (item.referenceUrl == undefined) ? "" : ('<a href="' + item.referenceUrl + '" target="blank">' + 'More about this place</a>');
-        var imgHTML = (item.imgSrc == undefined) ? "" : ('<img class="infowindow" src="' + item.imgSrc + '">');
-        infoWindow.setContent('<div class="infowindow"><h4>' + item.title + '</h4>'
-            + '<p><span class="glyphicon glyphicon-map-marker"></span> ' + item.address+ '</p>'
-            + ratingHTML + reviewHTML + imgHTML + linkHTML + '</div>');
+        var ratingHTML = (item.rating === undefined) ? "" : ('<p><span class="glyphicon glyphicon-heart"></span>   ' + item.rating + '</p>');
+        var reviewHTML = (item.review === undefined) ? "" : ('<p><span class="glyphicon glyphicon-pencil"></span>  ' + item.review + '</p>');
+        var linkHTML = (item.referenceUrl === undefined) ? "" : ('<a href="' + item.referenceUrl + '" target="blank">' + 'More about this place</a>');
+        var imgHTML = (item.imgSrc === undefined) ? "" : ('<img class="infowindow" src="' + item.imgSrc + '">');
+        infoWindow.setContent('<div class="infowindow"><h4>' + item.title + '</h4>' + '<p><span class="glyphicon glyphicon-map-marker"></span> ' + item.address+ '</p>' + ratingHTML + reviewHTML + imgHTML + linkHTML + '</div>');
         infoWindow.open(map, marker);
-    }
+    };
     InitListView();
 }
