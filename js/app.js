@@ -2,75 +2,72 @@ var map; // map is a global variable.
 
 //the initial locations are hard coded and the detailed infomation is manually getting from google map.
 //For simplicity, no photoUrl is included.
-var locations = [
-    {title: 'China Agricultural University Gymnasium',
-        location: {lat:40.003973, lng: 116.35936},
-        address: '17 Qinghua E Rd, Haidian Qu, Beijing Shi, China, 100083',
-        review: '体育馆好大，不过外墙有点掉色的感觉，保养没有工大好…',
-        rating: 9.4,
-        },
-    {title: 'Yuanmingyuan Park',
-        location: {lat: 40.008098, lng: 116.298215},
-        address: 'Yuanmingyuan Park, Haidian, China',
-        review: 'Park featuring colorful gardens & ruins dating from 1707 & burned during Second Opium War of 1860.',
-        rating: 8.8,
-        },
-    {title: 'Tsinghua University',
-        location: {lat: 39.999667, lng: 116.326444},
-        address: '30 Shuangqing Rd, Haidian Qu, Beijing Shi, China',
-        review: 'The most famous university in China, like Oxford and Cambridge in UK.Quit and beautiful, good place to stay.',
-        rating: 9.2,},
-    {title: 'Olympic Forest Park',
-        location: {lat: 40.032680, lng: 116.406112 },
-        address: 'China, Beijing Shi, Chaoyang Qu, 林翠路2号',
-        review: 'It was a nice walk around greenish forest area.there is a walking track distance around 10 km.',
-        rating: 8.8,},
-    {title: '798 Art Zone',
-        location: {lat: 39.982954, lng: 116.493244 },
-        address: '1 Qixing W St, Chaoyang Qu, Beijing Shi, China, 100096',
-        review: 'interesting but not expect lots of local arts, mainly a place with imported little gifts with some kinda designs',
-        rating: 8.6,},
-    {title: 'Palace Museum',
-        location: {lat: 39.916345, lng: 116.397155 },
-        address: '4 Jingshan Front St, Dongcheng Qu, Beijing Shi, China, 100006',
-        review: 'This place is incredible. Cannot believe this was built to accommodate for one person hundreds of years ago!',
-        rating: 9.0,},
-    {title: 'Peking University',
-        location: {lat: 39.986913, lng: 116.305874 },
-        address: '5 Yiheyuan Rd, Haidian Qu, Beijing Shi, China, 100080',
-        review: 'I have lived here for more than three years and will always miss it. Life was so convenient.',
-        rating: 9.0,},
-    {title: 'Quanjude',
-        location: {lat: 39.912235, lng: 116.411924},
-    address: '9 Shuaifuyuan Hutong, DongDan, Dongcheng Qu, Beijing Shi, China, 100005',
-        review: 'The waitress is nice, they teach us how to wrap the duck correctly.  The duck is nice.  We ordered a little bit more than enough.  Half duck is only one small plate, whole duck  is 2 plates.  They offer us a free duck soup.  Very nice.  They keep the duck  warm the with a candle under the plate like my picture here. ',
-        rating: 8.2,},
-    {title: 'Jian Wai SOHO',
-        location: {lat: 39.905696, lng: 116.459838},
-    address: 'China, Beijing Shi, Chaoyang Qu, JianWai DaJie, JianWai SOHO',
-        review: 'A pretty modern place.',
-        rating: 8.0,},
-    {title: 'Zhongguancun',
-        location: {lat: 39.983245, lng: 116.315509 },
-    address: 'ZhongGuanCun, Haidian Qu, Beijing Shi, China, 100080',
-        review: 'It was full of vitality.',
-        rating: 8.2,}
-];
-// I use setTimeout to handle the google map load error, but sometimes the response time is much longer than 5 seconds, why?
-var mapConstructTimeout = setTimeout(function() {
+// var locations = [
+//     {title: 'China Agricultural University Gymnasium',
+//         location: {lat:40.003973, lng: 116.35936},
+//         address: '17 Qinghua E Rd, Haidian Qu, Beijing Shi, China, 100083',
+//         review: '体育馆好大，不过外墙有点掉色的感觉，保养没有工大好…',
+//         rating: 9.4,
+//         },
+//     {title: 'Yuanmingyuan Park',
+//         location: {lat: 40.008098, lng: 116.298215},
+//         address: 'Yuanmingyuan Park, Haidian, China',
+//         review: 'Park featuring colorful gardens & ruins dating from 1707 & burned during Second Opium War of 1860.',
+//         rating: 8.8,
+//         },
+//     {title: 'Tsinghua University',
+//         location: {lat: 39.999667, lng: 116.326444},
+//         address: '30 Shuangqing Rd, Haidian Qu, Beijing Shi, China',
+//         review: 'The most famous university in China, like Oxford and Cambridge in UK.Quit and beautiful, good place to stay.',
+//         rating: 9.2,},
+//     {title: 'Olympic Forest Park',
+//         location: {lat: 40.032680, lng: 116.406112 },
+//         address: 'China, Beijing Shi, Chaoyang Qu, 林翠路2号',
+//         review: 'It was a nice walk around greenish forest area.there is a walking track distance around 10 km.',
+//         rating: 8.8,},
+//     {title: '798 Art Zone',
+//         location: {lat: 39.982954, lng: 116.493244 },
+//         address: '1 Qixing W St, Chaoyang Qu, Beijing Shi, China, 100096',
+//         review: 'interesting but not expect lots of local arts, mainly a place with imported little gifts with some kinda designs',
+//         rating: 8.6,},
+//     {title: 'Palace Museum',
+//         location: {lat: 39.916345, lng: 116.397155 },
+//         address: '4 Jingshan Front St, Dongcheng Qu, Beijing Shi, China, 100006',
+//         review: 'This place is incredible. Cannot believe this was built to accommodate for one person hundreds of years ago!',
+//         rating: 9.0,},
+//     {title: 'Peking University',
+//         location: {lat: 39.986913, lng: 116.305874 },
+//         address: '5 Yiheyuan Rd, Haidian Qu, Beijing Shi, China, 100080',
+//         review: 'I have lived here for more than three years and will always miss it. Life was so convenient.',
+//         rating: 9.0,},
+//     {title: 'Quanjude',
+//         location: {lat: 39.912235, lng: 116.411924},
+//     address: '9 Shuaifuyuan Hutong, DongDan, Dongcheng Qu, Beijing Shi, China, 100005',
+//         review: 'The waitress is nice, they teach us how to wrap the duck correctly.  The duck is nice.  We ordered a little bit more than enough.  Half duck is only one small plate, whole duck  is 2 plates.  They offer us a free duck soup.  Very nice.  They keep the duck  warm the with a candle under the plate like my picture here. ',
+//         rating: 8.2,},
+//     {title: 'Jian Wai SOHO',
+//         location: {lat: 39.905696, lng: 116.459838},
+//     address: 'China, Beijing Shi, Chaoyang Qu, JianWai DaJie, JianWai SOHO',
+//         review: 'A pretty modern place.',
+//         rating: 8.0,},
+//     {title: 'Zhongguancun',
+//         location: {lat: 39.983245, lng: 116.315509 },
+//     address: 'ZhongGuanCun, Haidian Qu, Beijing Shi, China, 100080',
+//         review: 'It was full of vitality.',
+//         rating: 8.2,}
+// ];
+var locations = [];
+// Give hints when google map can't load properly.
+var handleGoogleMapError = function() {
     document.getElementById('map').innerHTML = "<h2 class='map-error'>Sorry, an error happened. Can't load the map.</h2>";
-}, 8000);
-
+};
 //the callback function, initialize the map and the autocomplete, apply ko bindings
 var initMap = function() {
-    var center = {lat: 39.981827, lng: 116.359302 };
+    var center = {lat: 39.921211, lng: 116.410253 };
     map = new window.google.maps.Map(document.getElementById('map'), {
         zoom: 12,
         center: center
     });
-    if(map !== null) {
-        clearTimeout(mapConstructTimeout);
-    }
     var autoComplete = new window.google.maps.places.Autocomplete(document.getElementById('initialLocationQuery'), {
         componentRestrictions: {country: 'cn'}
     });
@@ -82,7 +79,7 @@ var ViewModel = function() {
     var self = this;
     this.currentState = ko.observable(1); // observes the state of the list panel
     this.searchText = ko.observable(""); // the input of the filter
-    this.initialLocationQuery = ko.observable(''); // the input of the top search
+    this.initialLocationQuery = ko.observable('Palace Museum'); // the input of the top search
     this.markers = ko.observableArray([]);
 
      // Since only ont infowindow is opened at one time, so I declare the infowindow as a property of viewmodel.
@@ -104,9 +101,17 @@ var ViewModel = function() {
     });//.extend({ notify: 'always' })
 
     // When filter button is clicked or keyup is happened, reset the markers
-    this.filterPlaces = function() {
+    this.filterPlaces = function(el, event) {
+        console.log(event);
+        if(event.keyCode === 13 || event.target) {
+            self.currentState(-1);
+            return;
+        }
         hideMarkers(self.markers()); //notice observables are functions
         showMarkers(self.filteredMarkers());
+        self.infoWindow.close();
+        if(self.currentMarker !== null)  self.currentMarker.setAnimation(null);
+
     };
 
     // Toggle the list panel when the hamburger menu is clicked.
@@ -126,7 +131,7 @@ var ViewModel = function() {
                         componentRestrictions: {country: 'cn'}},
         function(results, status) {
             if(status === 'OK') {
-                console.log(results);
+                // console.log(results);
                 var center = results[0].geometry.location;
                 getTopPicksFromSquare(center);
             }else {
@@ -154,7 +159,7 @@ var ViewModel = function() {
                 limit: 10,
                 client_id: 'N5WZOLWC4GO3MSQFIMODIP5ULRAVCKRGGYCKSAIH3FH41HIC',
                 client_secret: 'GKNWBWCDZMCBHEQPDFWW3YRNHAYFZZ1AKU4EM1DKXPNFOLM0',
-                v: dateStr // need to parse date, but later!!!!!!!!!!!!!!!!!!!!!!!!!
+                v: dateStr
             }
         })
         .then(function (results) {
@@ -169,7 +174,8 @@ var ViewModel = function() {
                 location.title = venue.name;
                 location.location.lat = venue.location.lat;
                 location.location.lng = venue.location.lng;
-                if(topPicks[i].tips !== null) { // some places didn't have tips property
+                // console.log(topPicks[i].tips);
+                if(topPicks[i].tips !== undefined) { // some places didn't have tips property, also notice null !== undefined
                     var tip = topPicks[i].tips[0];
                     location.review = tip.text;
                     location.imgSrc = tip.photourl;
@@ -190,11 +196,14 @@ var ViewModel = function() {
 
     // This function is responsive for getting data from locations to markers and thus update the view.
     var InitListView = function() {
+        if(window.innerWidth < 450) {
+            self.currentState(-1);
+        }
         var marker;
         var bounds = new google.maps.LatLngBounds();
         if(self.markers().length > 0) { // if it's length > 0, meaning it has previous data, so markers need to be removed.
             for(var i = 0; i < self.markers().length; i++) {
-                self.markers()[i].setMap(null);
+                self.markers()[i].setMap(null); // setMap is needed because old markers should be completely removed
             }
             self.markers.removeAll();
         }
@@ -232,13 +241,15 @@ var ViewModel = function() {
             toggleBounce(marker);
         }
         getDetail(marker, self.infoWindow);
+        if(window.innerWidth <= 420)    self.currentState(-1);
     };
 
     // show all the markers using setMap method. At the same time, I reset the bounds during the filter process.
     var showMarkers = function(markers) {
         var bounds = new google.maps.LatLngBounds();
         for(var i = 0; i < markers.length; i++) {
-            markers[i].setMap(map);
+            // markers[i].setMap(map);
+            markers[i].setVisible(true);
             bounds.extend(markers[i].position);
         }
         map.fitBounds(bounds);
@@ -246,7 +257,8 @@ var ViewModel = function() {
     // hide all the markers using setMap method.
     var hideMarkers = function(markers) {
         for(var i = 0; i < markers.length; i++) {
-            markers[i].setMap(null);
+            // markers[i].setMap(null);
+            markers[i].setVisible(false);
         }
     };
 
@@ -272,5 +284,6 @@ var ViewModel = function() {
         infoWindow.setContent('<div class="infowindow"><h4>' + item.title + '</h4>' + '<p><span class="glyphicon glyphicon-map-marker"></span> ' + item.address+ '</p>' + ratingHTML + reviewHTML + imgHTML + linkHTML + '</div>');
         infoWindow.open(map, marker);
     };
+    this.searchTopPicks();
     InitListView();
 };

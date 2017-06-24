@@ -69,3 +69,7 @@ html, body, .container { //this line is quite important, otherwise it can't show
     left: 40%;
     top: 40%;
 }
+.list-group-item:hover {
+    background-color: #777;
+    color: white;
+}

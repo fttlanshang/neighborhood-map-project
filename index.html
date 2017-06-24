@@ -4,12 +4,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     <title>Neighborhood Map Project</title>
-    <link rel="stylesheet" type="text/css" href="css/bootstrap-3.3.7-dist/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" href="css/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="container">
-    <div id="search" class="row">
+    <nav id="search" class="row">
         <div class="col-md-1  col-sm-1 col-xs-1">
             <div class="toggle-menu col-md-1 col-sm-1">
                 <button type="button"  data-bind="click: toggleShow">
@@ -27,8 +27,8 @@
                 </span>
             </div>
         </div>
-    </div>
-    <div  data-bind="style: {display: currentState() < 0 ? 'none' : 'block' }" id="filter-zone">
+    </nav>
+    <aside data-bind="style: {display: currentState() < 0 ? 'none' : 'block' }" id="filter-zone">
         <div class="input-group" id="filter">
             <input type="text" data-bind="textInput: searchText, event: {'keyup': filterPlaces}" class="form-control" placeholder="enter keywords to filter places">
             <span class="input-group-btn">
@@ -42,13 +42,13 @@
                 <li data-bind="text: $data.title, click: $parent.highlightMarker" class="list-group-item"></li>
             </ul>
         </div>
-    </div>
-    <div id="map" class="row"></div>
+    </aside>
+    <main id="map" class="row"></main>
 </div>
 
 <script src="js/knockout-3.4.2.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="js/app.js"></script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyAzRT7MjoGXdwIz1x63cEOY0eG4Hfg35Tw&callback=initMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyAzRT7MjoGXdwIz1x63cEOY0eG4Hfg35Tw&callback=initMap" onerror="handleGoogleMapError()"></script>
 </body>
 </html>
