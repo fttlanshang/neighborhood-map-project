@@ -2,7 +2,7 @@
 This is a simple map utilizing Knockout framework and google map API and other libraries, like Bootstrap and axios.
 
 ### General idea and functionalities
-- At its initial state, this app displays 10 interesting places in Beijing.
+- This app displays 10 places around Palace Museum by default. The detailed information was retrieved from the FourSquare API.
 - In the left side of this app, you can use the filter to find places that you are interested in.
 - You can click on any list item or any marker on the map to get detailed information(the address, review, rating, a photo) about the place. The detailed information was retrieved from the FourSquare API.
 - You can click the hamburger button to show/hide the list.

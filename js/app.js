@@ -1,62 +1,6 @@
 var map; // map is a global variable.
-
-//the initial locations are hard coded and the detailed infomation is manually getting from google map.
-//For simplicity, no photoUrl is included.
-// var locations = [
-//     {title: 'China Agricultural University Gymnasium',
-//         location: {lat:40.003973, lng: 116.35936},
-//         address: '17 Qinghua E Rd, Haidian Qu, Beijing Shi, China, 100083',
-//         review: '体育馆好大，不过外墙有点掉色的感觉，保养没有工大好…',
-//         rating: 9.4,
-//         },
-//     {title: 'Yuanmingyuan Park',
-//         location: {lat: 40.008098, lng: 116.298215},
-//         address: 'Yuanmingyuan Park, Haidian, China',
-//         review: 'Park featuring colorful gardens & ruins dating from 1707 & burned during Second Opium War of 1860.',
-//         rating: 8.8,
-//         },
-//     {title: 'Tsinghua University',
-//         location: {lat: 39.999667, lng: 116.326444},
-//         address: '30 Shuangqing Rd, Haidian Qu, Beijing Shi, China',
-//         review: 'The most famous university in China, like Oxford and Cambridge in UK.Quit and beautiful, good place to stay.',
-//         rating: 9.2,},
-//     {title: 'Olympic Forest Park',
-//         location: {lat: 40.032680, lng: 116.406112 },
-//         address: 'China, Beijing Shi, Chaoyang Qu, 林翠路2号',
-//         review: 'It was a nice walk around greenish forest area.there is a walking track distance around 10 km.',
-//         rating: 8.8,},
-//     {title: '798 Art Zone',
-//         location: {lat: 39.982954, lng: 116.493244 },
-//         address: '1 Qixing W St, Chaoyang Qu, Beijing Shi, China, 100096',
-//         review: 'interesting but not expect lots of local arts, mainly a place with imported little gifts with some kinda designs',
-//         rating: 8.6,},
-//     {title: 'Palace Museum',
-//         location: {lat: 39.916345, lng: 116.397155 },
-//         address: '4 Jingshan Front St, Dongcheng Qu, Beijing Shi, China, 100006',
-//         review: 'This place is incredible. Cannot believe this was built to accommodate for one person hundreds of years ago!',
-//         rating: 9.0,},
-//     {title: 'Peking University',
-//         location: {lat: 39.986913, lng: 116.305874 },
-//         address: '5 Yiheyuan Rd, Haidian Qu, Beijing Shi, China, 100080',
-//         review: 'I have lived here for more than three years and will always miss it. Life was so convenient.',
-//         rating: 9.0,},
-//     {title: 'Quanjude',
-//         location: {lat: 39.912235, lng: 116.411924},
-//     address: '9 Shuaifuyuan Hutong, DongDan, Dongcheng Qu, Beijing Shi, China, 100005',
-//         review: 'The waitress is nice, they teach us how to wrap the duck correctly.  The duck is nice.  We ordered a little bit more than enough.  Half duck is only one small plate, whole duck  is 2 plates.  They offer us a free duck soup.  Very nice.  They keep the duck  warm the with a candle under the plate like my picture here. ',
-//         rating: 8.2,},
-//     {title: 'Jian Wai SOHO',
-//         location: {lat: 39.905696, lng: 116.459838},
-//     address: 'China, Beijing Shi, Chaoyang Qu, JianWai DaJie, JianWai SOHO',
-//         review: 'A pretty modern place.',
-//         rating: 8.0,},
-//     {title: 'Zhongguancun',
-//         location: {lat: 39.983245, lng: 116.315509 },
-//     address: 'ZhongGuanCun, Haidian Qu, Beijing Shi, China, 100080',
-//         review: 'It was full of vitality.',
-//         rating: 8.2,}
-// ];
 var locations = [];
+
 // Give hints when google map can't load properly.
 var handleGoogleMapError = function() {
     document.getElementById('map').innerHTML = "<h2 class='map-error'>Sorry, an error happened. Can't load the map.</h2>";
@@ -98,20 +42,20 @@ var ViewModel = function() {
                 return marker.title.toLowerCase().indexOf(pattern) >= 0;
             });
         }
-    });//.extend({ notify: 'always' })
+    });
 
     // When filter button is clicked or keyup is happened, reset the markers
     this.filterPlaces = function(el, event) {
-        console.log(event);
-        if(event.keyCode === 13 || event.target) {
-            self.currentState(-1);
-            return;
+        if((event instanceof KeyboardEvent) && (event.keyCode !== 13)) {
+            hideMarkers(self.markers()); //notice observables are functions
+            showMarkers(self.filteredMarkers());
+            self.infoWindow.close();
+            if(self.currentMarker !== null)  self.currentMarker.setAnimation(null);
+        }else {
+            if(window.innerWidth < 450) {
+                self.currentState(-1);
+            }
         }
-        hideMarkers(self.markers()); //notice observables are functions
-        showMarkers(self.filteredMarkers());
-        self.infoWindow.close();
-        if(self.currentMarker !== null)  self.currentMarker.setAnimation(null);
-
     };
 
     // Toggle the list panel when the hamburger menu is clicked.
