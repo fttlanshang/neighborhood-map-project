@@ -94,7 +94,7 @@ var ViewModel = function() {
     var getTopPicksFromSquare = function(center) {
         var fourSquareUrl = 'https://api.foursquare.com/v2/venues/explore?';
         var date = new Date();
-        var dateStr = date.getFullYear() + '' + padding(date.getMonth()) + padding(date.getDay());
+        var dateStr = date.getFullYear() + '' + padding(date.getMonth() + 1) + padding(date.getDate());
         window.axios.get(fourSquareUrl, {
             params: {
                 ll: center.lat().toFixed(3) + ',' + center.lng().toFixed(3),
